@@ -1,11 +1,11 @@
-# AIQToolkit NVIDIA 🚀
+# AIQToolkit NVIDIA UI 🚀
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fplturrell%2Faiqtoolkit-nvidia&env=NVIDIA_ENDPOINT&envDescription=NVIDIA%20Brev%20Endpoint%20URL&envLink=https://brev.nvidia.com&project-name=aiqtoolkit-nvidia)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fplturrell%2Faiqtoolkit-nvidia-ui&env=NVIDIA_ENDPOINT&envDescription=NVIDIA%20Brev%20Endpoint%20URL&envLink=https://brev.nvidia.com&project-name=aiqtoolkit-nvidia-ui)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 [![NVIDIA Blueprint](https://img.shields.io/badge/NVIDIA-Blueprint-76B900)](https://developer.nvidia.com/)
 
-A powerful, production-ready web interface for NVIDIA AI model integration and report generation, built on the AIQToolkit framework.
+A modern, responsive web interface for interacting with NVIDIA AI models and services through AIQToolkit. Now with enhanced Vercel deployment support.
 
 ## ✨ Features
 
@@ -17,7 +17,8 @@ A powerful, production-ready web interface for NVIDIA AI model integration and r
 - **📱 Mobile Responsive** - Works perfectly on desktop, tablet, and mobile devices
 - **🚀 One-Click Deploy** - Deploy to Vercel with a single click
 - **🔧 Easy Configuration** - Simple environment variable setup
-- **🖥️ Local Console** - Try the blueprint from your own launchable console
+- **💻 Reasoning Interface** - Advanced reasoning with step-by-step explanations
+- **🤖 Digital Human Interface** - NVIDIA-powered digital human interactions
 
 ## 🚀 Quick Start
 
@@ -27,64 +28,58 @@ A powerful, production-ready web interface for NVIDIA AI model integration and r
 2. Add your `NVIDIA_ENDPOINT` environment variable
 3. Deploy and start using immediately!
 
-### Run Locally with Console Launcher
+### Alternative Deployment Methods
+
+For detailed deployment instructions, see [DEPLOY_INSTRUCTIONS.md](DEPLOY_INSTRUCTIONS.md).
+
+### Run Locally
 
 ```bash
 # Clone the repository
-git clone https://github.com/plturrell/aiqtoolkit-nvidia.git
-cd aiqtoolkit-nvidia
+git clone https://github.com/plturrell/aiqtoolkit-nvidia-ui.git
+cd aiqtoolkit-nvidia-ui
 
-# Run with default settings
-python scripts/launch_nvidia_blueprint_console.py
-
-# Run with specific ports
-python scripts/launch_nvidia_blueprint_console.py --api-port 8000 --ui-port 8080
-
-# Run in interactive console mode
-python scripts/launch_nvidia_blueprint_console.py --console
-
-# Run with custom NVIDIA endpoint
-python scripts/launch_nvidia_blueprint_console.py --nvidia-endpoint="https://your-endpoint.com"
-```
-
-### Local Development
-
-```bash
-# Clone the repository
-git clone https://github.com/plturrell/aiqtoolkit-nvidia.git
-cd aiqtoolkit-nvidia/web-ui
-
-# Start development server
+# Option 1: Using Python's built-in server (UI only)
 python -m http.server 3000
+
+# Option 2: Using Vercel CLI (full functionality)
+npm install -g vercel
+vercel dev
 ```
 
-Visit `http://localhost:3000/public/control-tower.html` to see the NVIDIA Control Tower.
+Visit `http://localhost:3000` to see the main dashboard.
 
-## 📡 Monitored NVIDIA Services
+## 📡 NVIDIA Services & Interfaces
 
-The Control Tower UI monitors these NVIDIA services:
+The AIQToolkit NVIDIA UI provides access to:
 
-- **NVIDIA NIM** - NVIDIA Inference Microservices for custom model deployment
-- **NVIDIA API** - NVIDIA AI Foundation Models API for standardized access
-- **NVIDIA NeMo** - NVIDIA NeMo text generation service
-- **NVIDIA Triton** - NVIDIA Triton Inference Server for high-performance serving
+- **Main Dashboard** - Central hub for all NVIDIA services
+- **Report Generator** - Create reports using NVIDIA AI models
+- **Control Tower** - Monitor NVIDIA services in real-time
+- **Reasoning Interface** - Advanced reasoning with step-by-step analysis
+- **Digital Human** - Conversational AI with NVIDIA models
+- **Blueprint Console** - Command-line interface to NVIDIA services
+- **System Status** - Health monitoring of all components
 
 ## 📁 Project Structure
 
 ```
 web-ui/
-├── public/             # Static web files
-│   ├── control-tower.html  # Main control tower interface
-│   ├── index.html      # Home page
-│   └── ...             # Other UI pages
-├── api/                # API handlers
-│   ├── generate.py     # Text generation API
-│   ├── health.py       # Health check API
-│   ├── nvidia.py       # NVIDIA services API
-│   └── reasoning.py    # Reasoning system API
-├── auto_deploy.sh      # Automated deployment script
-├── deploy_vercel.html  # Vercel deployment helper
-└── vercel.json         # Vercel configuration
+├── index.html            # Main dashboard UI
+├── public/               # Static assets and additional pages
+│   ├── control-tower.html   # Control tower interface
+│   ├── reasoning.html       # Reasoning interface
+│   ├── status.html          # System status page
+│   └── premium-design-system.css  # Design system
+├── api/                  # Serverless API functions
+│   ├── index.py          # Main API endpoint
+│   ├── health.py         # Health check endpoint
+│   ├── generate.py       # Content generation endpoint
+│   ├── nvidia.py         # NVIDIA model integration
+│   └── reasoning.py      # Reasoning engine endpoint
+├── vercel.json           # Vercel configuration
+├── package.json          # Project metadata
+└── requirements.txt      # Python dependencies
 ```
 
 ## ⚙️ Configuration
@@ -106,12 +101,13 @@ The `vercel.json` file configures:
 
 ## 🔌 API Endpoints
 
-### Health Check
-```http
-GET /api/health
-```
+- `/api` - API information
+- `/api/health` - System health check
+- `/api/generate` - Content generation
+- `/api/nvidia` - NVIDIA model integration
+- `/api/reasoning` - Reasoning engine
 
-### Generate with NVIDIA
+### Example: Generate with NVIDIA
 ```http
 POST /api/generate
 Content-Type: application/json
@@ -122,40 +118,12 @@ Content-Type: application/json
 }
 ```
 
-### NVIDIA Service Access
-```http
-POST /api/nvidia
-Content-Type: application/json
-
-{
-  "prompt": "Your prompt here",
-  "service_type": "nim|api|nemo|triton",
-  "model": "model-name"
-}
-```
-
-## 🖥️ Using the Console Launcher
-
-The `launch_nvidia_blueprint_console.py` script provides a simple way to run the NVIDIA Blueprint locally:
-
-```bash
-python scripts/launch_nvidia_blueprint_console.py --console
-```
-
-Console commands:
-- `status` - Check service status
-- `test` - Test NVIDIA services
-- `open` - Open Control Tower in browser
-- `logs` - View service logs
-- `config` - Show current configuration
-- `restart` - Restart services
-- `quit` - Exit the console
-
 ## 🛠️ Development
 
 ### Prerequisites
 
 - Python 3.8+ (for API functions)
+- Node.js 18+ (for Vercel CLI)
 - Git
 - NVIDIA CUDA (optional, for GPU acceleration)
 
@@ -163,7 +131,7 @@ Console commands:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/plturrell/aiqtoolkit-nvidia.git
+   git clone https://github.com/plturrell/aiqtoolkit-nvidia-ui.git
    ```
 
 2. **Install dependencies**
@@ -176,31 +144,9 @@ Console commands:
    # Option 1: Simple HTTP server
    python -m http.server 3000
    
-   # Option 2: Console launcher
-   python scripts/launch_nvidia_blueprint_console.py
-   ```
-
-## 🚢 Deployment
-
-### Automated Deployment
-
-Use the included deployment script:
-
-```bash
-chmod +x auto_deploy.sh
-./auto_deploy.sh
-```
-
-### Manual Deployment
-
-1. **Deploy to Vercel:**
-   ```bash
-   vercel --prod
-   ```
-
-2. **Set environment variables:**
-   ```bash
-   vercel env add NVIDIA_ENDPOINT production
+   # Option 2: Vercel CLI
+   npm install -g vercel
+   vercel dev
    ```
 
 ## 🔒 Security
@@ -214,25 +160,21 @@ chmod +x auto_deploy.sh
 - **Serverless Functions**: Auto-scaling based on demand
 - **CDN Distribution**: Global edge network via Vercel
 - **Optimized Assets**: Compressed images and minified code
-- **GPU Optimization**: NVIDIA-specific optimizations when available
+- **Design System**: Premium design system for consistent UI performance
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md).
+We welcome contributions! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
-
-- **Documentation**: [AIQToolkit Docs](https://docs.aiqtoolkit.ai)
-- **Issues**: [GitHub Issues](https://github.com/plturrell/aiqtoolkit-nvidia/issues)
-
 ## 🙏 Acknowledgments
 
 - **NVIDIA**: For providing powerful AI models and infrastructure
 - **AIQToolkit Team**: For the foundational framework
+- **Vercel**: For serverless hosting infrastructure
 
 ---
 

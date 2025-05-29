@@ -1,14 +1,14 @@
 {
-  "name": "aiqtoolkit-nvidia",
-  "version": "1.0.0",
+  "name": "aiqtoolkit-nvidia-ui",
+  "version": "1.1.0",
   "description": "A powerful, production-ready web interface for NVIDIA AI model integration and report generation",
-  "homepage": "https://github.com/plturrell/aiqtoolkit-nvidia#readme",
+  "homepage": "https://github.com/plturrell/finsightdeep#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/plturrell/aiqtoolkit-nvidia.git"
+    "url": "git+https://github.com/plturrell/finsightdeep.git"
   },
   "bugs": {
-    "url": "https://github.com/plturrell/aiqtoolkit-nvidia/issues"
+    "url": "https://github.com/plturrell/finsightdeep/issues"
   },
   "license": "MIT",
   "author": {
@@ -28,7 +28,7 @@
     "web-interface"
   ],
   "scripts": {
-    "dev": "python -m http.server 3000",
+    "dev": "vercel dev",
     "start": "python -m http.server 3000",
     "build": "echo 'Static site - no build required'",
     "test": "echo 'Tests will be implemented'",
@@ -46,9 +46,12 @@
     "not dead"
   ],
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "vercel": "^32.4.1"
+  },
   "files": [
     "api/",
+    "public/",
     "index.html",
     "vercel.json",
     "requirements.txt",

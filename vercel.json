@@ -1,13 +1,32 @@
 {
+  "version": 2,
   "env": {
-    "NVIDIA_ENDPOINT": "https://jupyter0-s1ondnjfx.brevlab.com"
+    "NVIDIA_ENDPOINT": "https://api.nvidia.com/nim/v1"
   },
-  "outputDirectory": "public",
+  "outputDirectory": ".",
   "buildCommand": null,
-  "rewrites": [
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/public/(.*)",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "headers": [
     {
       "source": "/(.*)",
-      "destination": "/public/$1"
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type,Authorization" }
+      ]
     }
   ]
 }
