@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIQ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            background: #000;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        .container {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #111 0%, #000 70%);
+        }
+
+        .interface {
+            width: 100%;
+            max-width: 800px;
+            padding: 0 40px;
+            opacity: 0;
+            animation: fadeIn 2s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .brand {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            font-size: 20px;
+            font-weight: 200;
+            letter-spacing: 2px;
+            opacity: 0.4;
+        }
+
+        .input-container {
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .prompt-input {
+            width: 100%;
+            background: none;
+            border: none;
+            font-size: 24px;
+            font-weight: 200;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            outline: none;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            letter-spacing: 0.5px;
+        }
+
+        .prompt-input:focus {
+            border-bottom-color: rgba(255,255,255,0.3);
+        }
+
+        .prompt-input::placeholder {
+            color: rgba(255,255,255,0.3);
+            font-weight: 200;
+        }
+
+        .generate-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.4);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 10px;
+            transition: all 0.2s ease;
+            opacity: 0;
+        }
+
+        .generate-btn.visible {
+            opacity: 1;
+        }
+
+        .generate-btn:hover {
+            color: #fff;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .response {
+            margin-top: 60px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            max-height: 50vh;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .response::-webkit-scrollbar {
+            display: none;
+        }
+
+        .response.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .response-text {
+            font-size: 18px;
+            line-height: 1.6;
+            font-weight: 300;
+            color: rgba(255,255,255,0.8);
+            text-align: left;
+        }
+
+        .thinking {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 40px;
+            opacity: 0;
+        }
+
+        .thinking.visible {
+            opacity: 1;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 80%, 100% { opacity: 0.2; }
+            40% { opacity: 1; }
+        }
+
+        .status {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.2);
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .status.connected {
+            color: rgba(76, 175, 80, 0.6);
+        }
+
+        /* Breathing effect for the container */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.002); }
+        }
+
+        .container.breathing {
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        /* Subtle mouse following effect */
+        .cursor-glow {
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        @media (max-width: 768px) {
+            .interface {
+                padding: 0 20px;
+            }
+            
+            .prompt-input {
+                font-size: 20px;
+            }
+            
+            .brand,
+            .status {
+                position: relative;
+                left: 0;
+                top: 0;
+                text-align: center;
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor-glow"></div>
+    
+    <div class="container breathing">
+        <div class="brand">AIQ</div>
+        
+        <div class="interface">
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    class="prompt-input" 
+                    placeholder="What would you like to know?"
+                    id="promptInput"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <button class="generate-btn" id="generateBtn">→</button>
+            </div>
+            
+            <div class="thinking" id="thinking">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            
+            <div class="response" id="response">
+                <div class="response-text" id="responseText"></div>
+            </div>
+        </div>
+        
+        <div class="status" id="status">initializing</div>
+    </div>
+
+    <script>
+        // Minimal, elegant JavaScript
+        class AIQ {
+            constructor() {
+                this.config = {
+                    backendUrl: window.location.origin
+                };
+                this.elements = {
+                    input: document.getElementById('promptInput'),
+                    button: document.getElementById('generateBtn'),
+                    thinking: document.getElementById('thinking'),
+                    response: document.getElementById('response'),
+                    responseText: document.getElementById('responseText'),
+                    status: document.getElementById('status'),
+                    cursorGlow: document.querySelector('.cursor-glow')
+                };
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.checkConnection();
+                this.initCursor();
+            }
+
+            bindEvents() {
+                this.elements.input.addEventListener('input', () => {
+                    const hasText = this.elements.input.value.trim().length > 0;
+                    this.elements.button.classList.toggle('visible', hasText);
+                });
+
+                this.elements.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && this.elements.input.value.trim()) {
+                        this.generate();
+                    }
+                });
+
+                this.elements.button.addEventListener('click', () => {
+                    if (this.elements.input.value.trim()) {
+                        this.generate();
+                    }
+                });
+            }
+
+            initCursor() {
+                document.addEventListener('mousemove', (e) => {
+                    this.elements.cursorGlow.style.left = e.clientX + 'px';
+                    this.elements.cursorGlow.style.top = e.clientY + 'px';
+                });
+            }
+
+            async checkConnection() {
+                try {
+                    const response = await fetch(`${this.config.backendUrl}/api/health`);
+                    if (response.ok) {
+                        this.updateStatus('connected', true);
+                    } else {
+                        this.updateStatus('offline');
+                    }
+                } catch (error) {
+                    this.updateStatus('offline');
+                }
+            }
+
+            updateStatus(text, isConnected = false) {
+                this.elements.status.textContent = text;
+                this.elements.status.classList.toggle('connected', isConnected);
+            }
+
+            async generate() {
+                const prompt = this.elements.input.value.trim();
+                if (!prompt) return;
+
+                this.showThinking(true);
+                this.hideResponse();
+
+                try {
+                    const response = await fetch(`${this.config.backendUrl}/api/generate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prompt,
+                            model: 'nvidia-ai',
+                            nvidia_endpoint: 'https://jupyter0-s1ondnjfx.brevlab.com'
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.showResponse(data.response || data.message || 'Response received');
+                    } else {
+                        this.showResponse('Unable to generate response. Please try again.');
+                    }
+                } catch (error) {
+                    this.showResponse('Connection error. Please check your network.');
+                } finally {
+                    this.showThinking(false);
+                }
+            }
+
+            showThinking(show) {
+                this.elements.thinking.classList.toggle('visible', show);
+            }
+
+            hideResponse() {
+                this.elements.response.classList.remove('visible');
+            }
+
+            showResponse(text) {
+                this.elements.responseText.textContent = text;
+                setTimeout(() => {
+                    this.elements.response.classList.add('visible');
+                }, 100);
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new AIQ();
+        });
+    </script>
+</body>
+</html>

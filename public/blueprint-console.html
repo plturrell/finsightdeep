@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVIDIA Blueprint Console</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #eaeaea;
+        }
+        .container {
+            background: #2d2d2d;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #eaeaea;
+            border-bottom: 3px solid #76b900;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nvidia-badge {
+            background: #76b900;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .terminal {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 5px;
+            height: 400px;
+            overflow-y: scroll;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid #444;
+        }
+        .input-line {
+            display: flex;
+            margin-top: 10px;
+        }
+        .prompt {
+            color: #76b900;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        #terminalInput {
+            flex-grow: 1;
+            background: #1e1e1e;
+            color: #f0f0f0;
+            border: none;
+            outline: none;
+            font-family: 'Courier New', monospace;
+            font-size: inherit;
+        }
+        .output {
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        .info {
+            color: #5bc0de;
+        }
+        .success {
+            color: #76b900;
+        }
+        .error {
+            color: #ff5252;
+        }
+        .command-box {
+            background: #333;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .command-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #76b900;
+        }
+        .command-desc {
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+        .command-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .command-item {
+            background: #444;
+            padding: 8px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .command-item:hover {
+            background: #555;
+        }
+        .status-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .service-card {
+            background: #333;
+            border-radius: 5px;
+            padding: 15px;
+            position: relative;
+        }
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .service-title {
+            font-weight: bold;
+            color: #eaeaea;
+        }
+        .service-status {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+        .status-online {
+            background: rgba(118, 185, 0, 0.2);
+            color: #76b900;
+        }
+        .status-offline {
+            background: rgba(255, 82, 82, 0.2);
+            color: #ff5252;
+        }
+        .status-unknown {
+            background: rgba(150, 150, 150, 0.2);
+            color: #aaa;
+        }
+        .config-item {
+            margin-top: 5px;
+            font-size: 13px;
+            color: #bbb;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            background: #444;
+            color: #f0f0f0;
+            border: 1px solid #666;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        button:hover {
+            background: #555;
+        }
+        button.primary {
+            background: #76b900;
+            color: white;
+            border: none;
+        }
+        button.primary:hover {
+            background: #5a8f00;
+        }
+        .navigation {
+            margin-bottom: 20px;
+        }
+        .navigation a {
+            margin-right: 15px;
+            color: #aaa;
+            text-decoration: none;
+        }
+        .navigation a:hover {
+            color: #76b900;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navigation">
+            <a href="index.html">Home</a>
+            <a href="control-tower.html">Control Tower</a>
+            <a href="blueprint-console.html"><strong>Blueprint Console</strong></a>
+        </div>
+
+        <h1>
+            NVIDIA Blueprint Console
+            <span class="nvidia-badge">AIQToolkit</span>
+        </h1>
+
+        <div class="command-box">
+            <div class="command-title">Quick Commands</div>
+            <div class="command-desc">Click to execute common commands:</div>
+            <div class="command-group">
+                <div class="command-item" onclick="executeCommand('status')">Check Status</div>
+                <div class="command-item" onclick="executeCommand('test')">Test Services</div>
+                <div class="command-item" onclick="executeCommand('open')">Open Control Tower</div>
+                <div class="command-item" onclick="executeCommand('logs')">View Logs</div>
+                <div class="command-item" onclick="executeCommand('config')">Show Config</div>
+                <div class="command-item" onclick="executeCommand('restart')">Restart Services</div>
+                <div class="command-item" onclick="executeCommand('help')">Help</div>
+            </div>
+        </div>
+
+        <div class="status-panel">
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-title">API Server</div>
+                    <div class="service-status status-unknown" id="api-status">Unknown</div>
+                </div>
+                <div class="config-item" id="api-port">Port: 8000</div>
+                <div class="config-item" id="api-uptime">Uptime: N/A</div>
+                <div class="actions">
+                    <button class="primary" onclick="executeCommand('restart api')">Restart</button>
+                    <button onclick="executeCommand('logs api')">Logs</button>
+                </div>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-title">Web UI</div>
+                    <div class="service-status status-unknown" id="ui-status">Unknown</div>
+                </div>
+                <div class="config-item" id="ui-port">Port: 8080</div>
+                <div class="config-item" id="ui-uptime">Uptime: N/A</div>
+                <div class="actions">
+                    <button class="primary" onclick="executeCommand('restart ui')">Restart</button>
+                    <button onclick="executeCommand('logs ui')">Logs</button>
+                </div>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-title">NVIDIA Connection</div>
+                    <div class="service-status status-unknown" id="nvidia-status">Unknown</div>
+                </div>
+                <div class="config-item" id="nvidia-endpoint">Endpoint: N/A</div>
+                <div class="config-item" id="nvidia-key">API Key: N/A</div>
+                <div class="actions">
+                    <button class="primary" onclick="executeCommand('test')">Test Connection</button>
+                    <button onclick="executeCommand('config')">Show Config</button>
+                </div>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-title">GPU Status</div>
+                    <div class="service-status status-unknown" id="gpu-status">Unknown</div>
+                </div>
+                <div class="config-item" id="gpu-info">GPU: N/A</div>
+                <div class="config-item" id="gpu-memory">Memory: N/A</div>
+                <div class="actions">
+                    <button class="primary" onclick="executeCommand('nvidia-smi')">GPU Info</button>
+                    <button onclick="executeCommand('test gpu')">Test GPU</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="terminal" id="terminal">
+            <div class="output info">AIQToolkit NVIDIA Blueprint Console v1.0.0</div>
+            <div class="output info">Type 'help' for available commands</div>
+            <div class="output">&nbsp;</div>
+        </div>
+
+        <div class="input-line">
+            <div class="prompt">blueprint&gt;</div>
+            <input type="text" id="terminalInput" autofocus 
+                   onkeydown="if(event.key==='Enter') executeInput()">
+        </div>
+    </div>
+
+    <script>
+        // Terminal history
+        const terminal = document.getElementById('terminal');
+        const input = document.getElementById('terminalInput');
+        let commandHistory = [];
+        let historyIndex = -1;
+        
+        // Simulated environment
+        let environment = {
+            services: {
+                api: { running: false, port: 8000, startTime: null },
+                ui: { running: false, port: 8080, startTime: null }
+            },
+            config: {
+                nvidia_endpoint: localStorage.getItem('nvidiaEndpoint') || '',
+                nvidia_api_key: localStorage.getItem('nvidiaApiKey') || ''
+            },
+            gpu: {
+                detected: false,
+                info: 'No GPU detected',
+                memory: 'N/A'
+            }
+        };
+
+        // Initialize the terminal
+        function initTerminal() {
+            // Try to detect NVIDIA configuration from localStorage
+            const savedConfig = localStorage.getItem('nvidiaControlTowerConfig');
+            if (savedConfig) {
+                const parsedConfig = JSON.parse(savedConfig);
+                if (parsedConfig.nvidiaEndpoint) {
+                    environment.config.nvidia_endpoint = parsedConfig.nvidiaEndpoint;
+                }
+                if (parsedConfig.nvidiaApiKey) {
+                    environment.config.nvidia_api_key = parsedConfig.nvidiaApiKey;
+                }
+            }
+            
+            // Update UI
+            updateStatusDisplay();
+            
+            // Focus input
+            input.focus();
+        }
+
+        // Execute command when entered
+        function executeInput() {
+            const command = input.value.trim();
+            if (command) {
+                addToHistory(command);
+                executeCommand(command);
+                input.value = '';
+            }
+        }
+        
+        // Add command to history
+        function addToHistory(command) {
+            commandHistory.push(command);
+            historyIndex = commandHistory.length;
+        }
+        
+        // Navigate history with up/down arrows
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowUp') {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    input.value = commandHistory[historyIndex];
+                }
+                e.preventDefault();
+            } else if (e.key === 'ArrowDown') {
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = commandHistory[historyIndex];
+                } else {
+                    historyIndex = commandHistory.length;
+                    input.value = '';
+                }
+                e.preventDefault();
+            }
+        });
+
+        // Execute a command in the terminal
+        function executeCommand(command) {
+            // Print command to terminal
+            const cmdOutput = document.createElement('div');
+            cmdOutput.className = 'output';
+            cmdOutput.innerHTML = `<span class="prompt">blueprint&gt;</span> ${command}`;
+            terminal.appendChild(cmdOutput);
+            
+            // Process commands
+            const cmd = command.toLowerCase().trim();
+            
+            if (cmd === 'help') {
+                showHelp();
+            } else if (cmd === 'status') {
+                showStatus();
+            } else if (cmd === 'test') {
+                testServices();
+            } else if (cmd.startsWith('test ')) {
+                const service = cmd.split(' ')[1];
+                testService(service);
+            } else if (cmd === 'open') {
+                openControlTower();
+            } else if (cmd === 'logs') {
+                showLogs();
+            } else if (cmd.startsWith('logs ')) {
+                const service = cmd.split(' ')[1];
+                showServiceLogs(service);
+            } else if (cmd === 'config') {
+                showConfig();
+            } else if (cmd === 'restart') {
+                restartServices();
+            } else if (cmd.startsWith('restart ')) {
+                const service = cmd.split(' ')[1];
+                restartService(service);
+            } else if (cmd === 'clear') {
+                clearTerminal();
+                return; // Skip scrolling
+            } else if (cmd === 'exit' || cmd === 'quit') {
+                quitConsole();
+            } else if (cmd === 'nvidia-smi') {
+                showNvidiaSmi();
+            } else if (cmd.startsWith('set ')) {
+                setConfig(cmd.substring(4));
+            } else {
+                printToTerminal(`Unknown command: ${command}. Type 'help' for available commands.`, 'error');
+            }
+            
+            // Scroll to bottom
+            terminal.scrollTop = terminal.scrollHeight;
+            
+            // Focus input
+            input.focus();
+        }
+        
+        // Show help information
+        function showHelp() {
+            printToTerminal(`
+Available commands:
+
+  status      - Show service status
+  test        - Test NVIDIA services
+  test [svc]  - Test specific service (nim, api, nemo, triton, gpu)
+  open        - Open the control tower UI in browser
+  logs        - View service logs
+  logs [svc]  - View logs for specific service (api, ui)
+  config      - Show current configuration
+  set [key=value] - Set configuration (nvidia_endpoint, nvidia_api_key)
+  restart     - Restart all services
+  restart [svc] - Restart specific service (api, ui)
+  nvidia-smi  - Show GPU information
+  clear       - Clear terminal
+  quit        - Exit the console
+`, 'info');
+        }
+        
+        // Show service status
+        function showStatus() {
+            simulateServiceCheck();
+            
+            const apiStatus = environment.services.api.running ? 'Running' : 'Stopped';
+            const uiStatus = environment.services.ui.running ? 'Running' : 'Stopped';
+            const apiUptime = getUptimeString(environment.services.api.startTime);
+            const uiUptime = getUptimeString(environment.services.ui.startTime);
+            
+            printToTerminal(`
+Service Status:
+
+  API Server: ${apiStatus}
+    Port: ${environment.services.api.port}
+    Uptime: ${apiUptime}
+    
+  Web UI: ${uiStatus}
+    Port: ${environment.services.ui.port}
+    Uptime: ${uiUptime}
+    
+  NVIDIA Configuration:
+    Endpoint: ${environment.config.nvidia_endpoint || 'Not configured'}
+    API Key: ${environment.config.nvidia_api_key ? 'Configured' : 'Not configured'}
+    
+  GPU Status: ${environment.gpu.detected ? 'Detected' : 'Not detected'}
+    ${environment.gpu.info}
+    ${environment.gpu.memory}
+`, 'info');
+
+            updateStatusDisplay();
+        }
+        
+        // Get uptime string
+        function getUptimeString(startTime) {
+            if (!startTime) return 'Not running';
+            
+            const uptime = Math.floor((new Date() - startTime) / 1000);
+            if (uptime < 60) {
+                return `${uptime} seconds`;
+            } else if (uptime < 3600) {
+                return `${Math.floor(uptime / 60)} minutes`;
+            } else {
+                const hours = Math.floor(uptime / 3600);
+                const minutes = Math.floor((uptime % 3600) / 60);
+                return `${hours} hours, ${minutes} minutes`;
+            }
+        }
+        
+        // Test all services
+        function testServices() {
+            printToTerminal('Testing NVIDIA services...', 'info');
+            
+            // Simulate testing each service
+            setTimeout(() => {
+                testService('nim');
+            }, 500);
+            
+            setTimeout(() => {
+                testService('api');
+            }, 1000);
+            
+            setTimeout(() => {
+                testService('nemo');
+            }, 1500);
+            
+            setTimeout(() => {
+                testService('triton');
+            }, 2000);
+            
+            // Also test GPU
+            setTimeout(() => {
+                testService('gpu');
+            }, 2500);
+        }
+        
+        // Test specific service
+        function testService(service) {
+            printToTerminal(`Testing ${service.toUpperCase()}...`, 'info');
+            
+            // Simulate service testing
+            setTimeout(() => {
+                const success = Math.random() > 0.3; // 70% chance of success
+                
+                if (success) {
+                    printToTerminal(`${service.toUpperCase()} test successful`, 'success');
+                    if (service === 'nim') {
+                        document.getElementById('nvidia-status').className = 'service-status status-online';
+                        document.getElementById('nvidia-status').textContent = 'Online';
+                    } else if (service === 'gpu') {
+                        environment.gpu.detected = true;
+                        environment.gpu.info = 'NVIDIA A100 GPU';
+                        environment.gpu.memory = 'Memory: 30GB / 40GB';
+                        document.getElementById('gpu-status').className = 'service-status status-online';
+                        document.getElementById('gpu-status').textContent = 'Active';
+                        document.getElementById('gpu-info').textContent = environment.gpu.info;
+                        document.getElementById('gpu-memory').textContent = environment.gpu.memory;
+                    }
+                } else {
+                    printToTerminal(`${service.toUpperCase()} test failed`, 'error');
+                    if (service === 'nim') {
+                        document.getElementById('nvidia-status').className = 'service-status status-offline';
+                        document.getElementById('nvidia-status').textContent = 'Offline';
+                    } else if (service === 'gpu') {
+                        document.getElementById('gpu-status').className = 'service-status status-offline';
+                        document.getElementById('gpu-status').textContent = 'Unavailable';
+                    }
+                }
+                
+                terminal.scrollTop = terminal.scrollHeight;
+            }, 1000);
+        }
+        
+        // Open control tower
+        function openControlTower() {
+            printToTerminal('Opening Control Tower...', 'info');
+            window.open('control-tower.html', '_blank');
+            printToTerminal('Control Tower opened in new tab', 'success');
+        }
+        
+        // Show logs
+        function showLogs() {
+            printToTerminal(`
+Available logs:
+
+  1. API server
+  2. Web UI
+
+Enter 'logs api' or 'logs ui' to view specific logs.
+`, 'info');
+        }
+        
+        // Show service logs
+        function showServiceLogs(service) {
+            // Simulate log output
+            if (service === 'api') {
+                printToTerminal(`
+=== API Server Logs ===
+
+[2023-05-29 09:15:32] INFO: API server starting on port ${environment.services.api.port}
+[2023-05-29 09:15:33] INFO: Loaded NVIDIA configuration from environment
+[2023-05-29 09:15:33] INFO: API server started successfully
+[2023-05-29 09:15:45] INFO: Health check requested
+[2023-05-29 09:16:10] INFO: Received request for NVIDIA NIM service
+[2023-05-29 09:16:12] INFO: Response received from NVIDIA (200 OK)
+`, 'info');
+            } else if (service === 'ui') {
+                printToTerminal(`
+=== Web UI Server Logs ===
+
+[2023-05-29 09:15:35] INFO: Web UI server starting on port ${environment.services.ui.port}
+[2023-05-29 09:15:35] INFO: Static server initialized
+[2023-05-29 09:15:35] INFO: Web UI server started successfully
+[2023-05-29 09:15:55] INFO: Serving: /index.html
+[2023-05-29 09:16:10] INFO: Serving: /control-tower.html
+`, 'info');
+            } else {
+                printToTerminal(`Unknown service: ${service}. Valid options are 'api' or 'ui'.`, 'error');
+            }
+        }
+        
+        // Show configuration
+        function showConfig() {
+            printToTerminal(`
+Current Configuration:
+
+  API Port:        ${environment.services.api.port}
+  UI Port:         ${environment.services.ui.port}
+  NVIDIA Endpoint: ${environment.config.nvidia_endpoint || 'Not configured'}
+  NVIDIA API Key:  ${environment.config.nvidia_api_key ? 'Configured' : 'Not configured'}
+  
+  GPU Configuration:
+    GPU Count:       ${environment.gpu.detected ? '1' : '0'}
+    Flash Attention: Enabled
+    TensorRT:        Enabled
+`, 'info');
+
+            // Update display
+            document.getElementById('nvidia-endpoint').textContent = `Endpoint: ${environment.config.nvidia_endpoint || 'N/A'}`;
+            document.getElementById('nvidia-key').textContent = `API Key: ${environment.config.nvidia_api_key ? 'Configured' : 'N/A'}`;
+        }
+        
+        // Set configuration
+        function setConfig(configString) {
+            const parts = configString.trim().split('=');
+            if (parts.length !== 2) {
+                printToTerminal('Invalid format. Use "set key=value".', 'error');
+                return;
+            }
+            
+            const key = parts[0].trim();
+            const value = parts[1].trim();
+            
+            if (key === 'nvidia_endpoint') {
+                environment.config.nvidia_endpoint = value;
+                localStorage.setItem('nvidiaEndpoint', value);
+                printToTerminal(`NVIDIA endpoint set to: ${value}`, 'success');
+            } else if (key === 'nvidia_api_key') {
+                environment.config.nvidia_api_key = value;
+                localStorage.setItem('nvidiaApiKey', value);
+                printToTerminal(`NVIDIA API key set to: ${value.substring(0, 8)}...`, 'success');
+            } else if (key === 'api_port') {
+                environment.services.api.port = parseInt(value);
+                printToTerminal(`API port set to: ${value}`, 'success');
+            } else if (key === 'ui_port') {
+                environment.services.ui.port = parseInt(value);
+                printToTerminal(`UI port set to: ${value}`, 'success');
+            } else {
+                printToTerminal(`Unknown configuration key: ${key}`, 'error');
+                return;
+            }
+            
+            // Update config in localStorage for integration with control tower
+            const controlTowerConfig = {
+                nvidiaEndpoint: environment.config.nvidia_endpoint,
+                nvidiaApiKey: environment.config.nvidia_api_key
+            };
+            localStorage.setItem('nvidiaControlTowerConfig', JSON.stringify(controlTowerConfig));
+            
+            // Update UI
+            updateStatusDisplay();
+        }
+        
+        // Restart all services
+        function restartServices() {
+            printToTerminal('Restarting all services...', 'info');
+            
+            // Stop services
+            environment.services.api.running = false;
+            environment.services.ui.running = false;
+            updateStatusDisplay();
+            
+            // Start services after delay
+            setTimeout(() => {
+                startServices();
+                printToTerminal('All services restarted successfully', 'success');
+                updateStatusDisplay();
+            }, 2000);
+        }
+        
+        // Restart specific service
+        function restartService(service) {
+            if (service === 'api') {
+                printToTerminal('Restarting API server...', 'info');
+                environment.services.api.running = false;
+                updateStatusDisplay();
+                
+                setTimeout(() => {
+                    environment.services.api.running = true;
+                    environment.services.api.startTime = new Date();
+                    printToTerminal('API server restarted successfully', 'success');
+                    updateStatusDisplay();
+                }, 1500);
+                
+            } else if (service === 'ui') {
+                printToTerminal('Restarting Web UI...', 'info');
+                environment.services.ui.running = false;
+                updateStatusDisplay();
+                
+                setTimeout(() => {
+                    environment.services.ui.running = true;
+                    environment.services.ui.startTime = new Date();
+                    printToTerminal('Web UI restarted successfully', 'success');
+                    updateStatusDisplay();
+                }, 1500);
+                
+            } else {
+                printToTerminal(`Unknown service: ${service}. Valid options are 'api' or 'ui'.`, 'error');
+            }
+        }
+        
+        // Simulate starting services
+        function startServices() {
+            environment.services.api.running = true;
+            environment.services.api.startTime = new Date();
+            
+            environment.services.ui.running = true;
+            environment.services.ui.startTime = new Date();
+        }
+        
+        // Simulate service check
+        function simulateServiceCheck() {
+            // Randomly set services as running/stopped for demonstration
+            if (Math.random() > 0.3) {
+                if (!environment.services.api.running) {
+                    environment.services.api.running = true;
+                    environment.services.api.startTime = new Date(Date.now() - Math.random() * 3600000);
+                }
+            }
+            
+            if (Math.random() > 0.3) {
+                if (!environment.services.ui.running) {
+                    environment.services.ui.running = true;
+                    environment.services.ui.startTime = new Date(Date.now() - Math.random() * 3600000);
+                }
+            }
+            
+            // Simulate GPU detection
+            if (Math.random() > 0.3) {
+                environment.gpu.detected = true;
+                environment.gpu.info = 'NVIDIA A100 GPU';
+                environment.gpu.memory = 'Memory: 30GB / 40GB';
+            } else {
+                environment.gpu.detected = false;
+                environment.gpu.info = 'No GPU detected';
+                environment.gpu.memory = 'N/A';
+            }
+        }
+        
+        // Update status display
+        function updateStatusDisplay() {
+            // Update API status
+            const apiStatusEl = document.getElementById('api-status');
+            if (environment.services.api.running) {
+                apiStatusEl.className = 'service-status status-online';
+                apiStatusEl.textContent = 'Running';
+            } else {
+                apiStatusEl.className = 'service-status status-offline';
+                apiStatusEl.textContent = 'Stopped';
+            }
+            document.getElementById('api-port').textContent = `Port: ${environment.services.api.port}`;
+            document.getElementById('api-uptime').textContent = `Uptime: ${getUptimeString(environment.services.api.startTime)}`;
+            
+            // Update UI status
+            const uiStatusEl = document.getElementById('ui-status');
+            if (environment.services.ui.running) {
+                uiStatusEl.className = 'service-status status-online';
+                uiStatusEl.textContent = 'Running';
+            } else {
+                uiStatusEl.className = 'service-status status-offline';
+                uiStatusEl.textContent = 'Stopped';
+            }
+            document.getElementById('ui-port').textContent = `Port: ${environment.services.ui.port}`;
+            document.getElementById('ui-uptime').textContent = `Uptime: ${getUptimeString(environment.services.ui.startTime)}`;
+            
+            // Update NVIDIA status
+            const nvidiaStatusEl = document.getElementById('nvidia-status');
+            if (environment.config.nvidia_endpoint) {
+                nvidiaStatusEl.className = 'service-status status-unknown';
+                nvidiaStatusEl.textContent = 'Unchecked';
+            } else {
+                nvidiaStatusEl.className = 'service-status status-offline';
+                nvidiaStatusEl.textContent = 'Not Configured';
+            }
+            document.getElementById('nvidia-endpoint').textContent = `Endpoint: ${environment.config.nvidia_endpoint || 'Not configured'}`;
+            document.getElementById('nvidia-key').textContent = `API Key: ${environment.config.nvidia_api_key ? 'Configured' : 'Not configured'}`;
+            
+            // Update GPU status
+            const gpuStatusEl = document.getElementById('gpu-status');
+            if (environment.gpu.detected) {
+                gpuStatusEl.className = 'service-status status-online';
+                gpuStatusEl.textContent = 'Active';
+            } else {
+                gpuStatusEl.className = 'service-status status-offline';
+                gpuStatusEl.textContent = 'Not Detected';
+            }
+            document.getElementById('gpu-info').textContent = environment.gpu.info;
+            document.getElementById('gpu-memory').textContent = environment.gpu.memory;
+        }
+        
+        // Show nvidia-smi output
+        function showNvidiaSmi() {
+            if (environment.gpu.detected) {
+                printToTerminal(`
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03               |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA A100 80G...  On   | 00000000:00:04.0 Off |                    0 |
+| N/A   37C    P0    42W / 300W |   1200MiB / 40960MiB |      0%      Default |
+|                               |                      |             Disabled |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|    0   N/A  N/A      1234      C   /usr/bin/python3                1198MiB |
++-----------------------------------------------------------------------------+
+`, 'info');
+            } else {
+                printToTerminal('No NVIDIA GPU detected or nvidia-smi not available', 'error');
+            }
+        }
+        
+        // Clear terminal
+        function clearTerminal() {
+            terminal.innerHTML = '';
+            printToTerminal('AIQToolkit NVIDIA Blueprint Console v1.0.0', 'info');
+            printToTerminal('Type \'help\' for available commands', 'info');
+            printToTerminal('&nbsp;');
+        }
+        
+        // Quit console
+        function quitConsole() {
+            printToTerminal('Shutting down services...', 'info');
+            
+            setTimeout(() => {
+                printToTerminal('Goodbye!', 'success');
+                
+                // In a real implementation, this would actually shut down services
+                // For the HTML demo, we'll just disable input
+                input.disabled = true;
+                
+                // Prompt to switch to another page
+                setTimeout(() => {
+                    if (confirm('Console session ended. Go to Control Tower?')) {
+                        window.location.href = 'control-tower.html';
+                    }
+                }, 1000);
+            }, 1500);
+        }
+        
+        // Print to terminal with optional class
+        function printToTerminal(message, className = '') {
+            const output = document.createElement('div');
+            output.className = `output ${className}`;
+            output.innerHTML = message;
+            terminal.appendChild(output);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start with services running
+            simulateServiceCheck();
+            if (!environment.services.api.running) {
+                environment.services.api.running = true;
+                environment.services.api.startTime = new Date(Date.now() - 1800000); // 30 minutes ago
+            }
+            if (!environment.services.ui.running) {
+                environment.services.ui.running = true;
+                environment.services.ui.startTime = new Date(Date.now() - 1800000); // 30 minutes ago
+            }
+            
+            initTerminal();
+            updateStatusDisplay();
+        });
+    </script>
+</body>
+</html>

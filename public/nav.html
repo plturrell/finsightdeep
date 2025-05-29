@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIQToolkit NVIDIA - UI Navigation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .ui-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .ui-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .ui-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+        
+        .ui-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .ui-card.test .ui-icon { color: #ff6b6b; }
+        .ui-card.prompt .ui-icon { color: #4ecdc4; }
+        .ui-card.digital .ui-icon { color: #45b7d1; }
+        
+        .ui-card h3 {
+            font-size: 1.5em;
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+        
+        .ui-card p {
+            color: #666;
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+        }
+        
+        .ui-card .features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .ui-card .features li {
+            background: #f8f9fa;
+            margin: 5px 0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .status-badge.live {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge.new {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            margin-top: 40px;
+        }
+        
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AIQToolkit NVIDIA</h1>
+            <p>Choose your AI interface experience</p>
+        </div>
+        
+        <div class="ui-grid">
+            <!-- Pure Interface -->
+            <a href="/pure.html" class="ui-card prompt">
+                <span class="status-badge new">10/10</span>
+                <span class="ui-icon">✨</span>
+                <h3>Pure</h3>
+                <p>Jony Ive-inspired design with perfect simplicity and elegance</p>
+                <ul class="features">
+                    <li>Minimalist design</li>
+                    <li>Fluid animations</li>
+                    <li>Perfect typography</li>
+                    <li>Apple-quality UX</li>
+                </ul>
+            </a>
+            
+            <!-- Minimal Interface -->
+            <a href="/minimal.html" class="ui-card prompt">
+                <span class="status-badge new">8/10</span>
+                <span class="ui-icon">🌙</span>
+                <h3>Minimal</h3>
+                <p>Dark, sophisticated interface with subtle interactions</p>
+                <ul class="features">
+                    <li>Dark aesthetic</li>
+                    <li>Breathing animations</li>
+                    <li>Cursor following</li>
+                    <li>Premium feel</li>
+                </ul>
+            </a>
+            
+            <!-- Test Interface -->
+            <a href="/test_deployment.html" class="ui-card test">
+                <span class="status-badge live">DEV</span>
+                <span class="ui-icon">🧪</span>
+                <h3>Test</h3>
+                <p>Developer diagnostics and API testing</p>
+                <ul class="features">
+                    <li>API endpoint testing</li>
+                    <li>CORS verification</li>
+                    <li>Error diagnostics</li>
+                </ul>
+            </a>
+        </div>
+        
+        <div class="ui-grid">
+            <!-- Original Simple Interface -->
+            <a href="/index.html" class="ui-card prompt">
+                <span class="status-badge live">2/10</span>
+                <span class="ui-icon">📝</span>
+                <h3>Original</h3>
+                <p>Basic NVIDIA report generator (the 2/10 design you mentioned)</p>
+                <ul class="features">
+                    <li>Basic form layout</li>
+                    <li>Functional but ugly</li>
+                    <li>No design polish</li>
+                    <li>NVIDIA integration</li>
+                </ul>
+            </a>
+            
+            <!-- Digital Human Interface -->
+            <a href="/digital_human_interface.html" class="ui-card digital">
+                <span class="status-badge new">3/10</span>
+                <span class="ui-icon">🤖</span>
+                <h3>Digital Human</h3>
+                <p>3D avatar financial advisor (also needs design work)</p>
+                <ul class="features">
+                    <li>3D avatar attempt</li>
+                    <li>Financial advisory</li>
+                    <li>Complex but messy</li>
+                    <li>Needs refinement</li>
+                </ul>
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>
+                🔒 <strong>Private Deployment</strong> - Protected by Vercel Authentication<br>
+                📊 <a href="https://github.com/plturrell/aiqtoolkit-nvidia">View on GitHub</a> | 
+                📖 <a href="/test_deployment.html">Run Diagnostics</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

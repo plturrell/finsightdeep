@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deploy to Vercel</title>
+    <style>
+        body { font-family: Arial; padding: 40px; text-align: center; }
+        .btn { 
+            background: #000; 
+            color: white; 
+            padding: 12px 24px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            display: inline-block;
+            margin: 20px;
+        }
+        .env-note {
+            background: #f0f0f0;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Deploy AIQToolkit to Vercel</h1>
+    
+    <div class="env-note">
+        <h3>Environment Variable to Add:</h3>
+        <code>NVIDIA_ENDPOINT = https://jupyter0-s1ondnjfx.brevlab.com</code>
+    </div>
+    
+    <a href="https://vercel.com/new/clone?repository-url=https%3A//github.com/plturrell/aiqtoolkit-reasoning-engine-1748335217&env=NVIDIA_ENDPOINT&envDescription=NVIDIA%20Brev%20Endpoint&envLink=https://brev.nvidia.com&project-name=aiqtoolkit-reasoning-engine-1748335217&repository-name=aiqtoolkit-reasoning-engine-1748335217" class="btn" target="_blank">
+        Deploy to Vercel
+    </a>
+    
+    <p>Click the button above to deploy your project to Vercel.</p>
+    <p>Make sure to add the environment variable during deployment!</p>
+    
+    <script>
+        // Auto-open Vercel
+        window.open('https://vercel.com/new/clone?repository-url=https%3A//github.com/plturrell/aiqtoolkit-reasoning-engine-1748335217&env=NVIDIA_ENDPOINT&envDescription=NVIDIA%20Brev%20Endpoint&envLink=https://brev.nvidia.com&project-name=aiqtoolkit-reasoning-engine-1748335217&repository-name=aiqtoolkit-reasoning-engine-1748335217', '_blank');
+    </script>
+</body>
+</html>

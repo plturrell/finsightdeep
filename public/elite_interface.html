@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIQ Digital Human - Premium Financial Assistant</title>
+    
+    <!-- Elite Styles -->
+    <link rel="stylesheet" href="elite_styles.css">
+    
+    <!-- Three.js for 3D Avatar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Chart.js for Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- GSAP for Premium Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Premium Header -->
+    <header class="elite-header glass-container">
+        <div class="logo-section">
+            <div class="logo">DH</div>
+            <h1 class="brand-name">Digital Human</h1>
+        </div>
+        
+        <div class="status-section">
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text">AI Assistant Active</span>
+            </div>
+            
+            <div class="user-profile">
+                <img src="https://ui-avatars.com/api/?name=Premium+User&background=0066FF&color=fff" 
+                     alt="User" class="user-avatar">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Premium Sidebar -->
+        <aside class="premium-sidebar">
+            <div class="portfolio-overview">
+                <h2 class="section-title">Portfolio Value</h2>
+                <div class="portfolio-value">$2,451,329</div>
+                <div class="portfolio-change">
+                    <i class="fas fa-trending-up"></i>
+                    <span>+12.5% ($274,891)</span>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Performance</h3>
+                    <div class="time-selector">
+                        <button class="time-option">1D</button>
+                        <button class="time-option active">1W</button>
+                        <button class="time-option">1M</button>
+                        <button class="time-option">1Y</button>
+                    </div>
+                </div>
+                <canvas id="performanceChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Asset Allocation</h3>
+                </div>
+                <canvas id="allocationChart"></canvas>
+            </div>
+            
+            <div class="quick-actions">
+                <h3 class="section-title">Quick Actions</h3>
+                <div class="action-grid">
+                    <button class="action-btn">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analyze</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-balance-scale"></i>
+                        <span>Rebalance</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Tax Report</span>
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Risk Analysis</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Avatar Section -->
+        <section class="avatar-section">
+            <div class="avatar-controls">
+                <button class="control-btn" id="avatarModeBtn" title="Switch Avatar Mode">
+                    <i class="fas fa-cube"></i>
+                </button>
+                <button class="control-btn" id="voiceBtn" title="Voice Control">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button class="control-btn" id="settingsBtn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+            
+            <div class="avatar-canvas">
+                <div id="premiumAvatar"></div>
+                <canvas id="photorealisticCanvas" style="display: none;"></canvas>
+            </div>
+            
+            <div class="avatar-frame"></div>
+            
+            <!-- Voice Visualization -->
+            <div class="voice-visualization" id="voiceViz" style="display: none;">
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+            </div>
+        </section>
+
+        <!-- Chat Section -->
+        <section class="chat-section">
+            <div class="chat-header">
+                <h2 class="chat-title">Financial Assistant</h2>
+                <div class="chat-status">
+                    <span class="typing-indicator" style="display: none;">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai fade-in">
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content">
+                        <p class="message-text">Hello! I'm your premium financial assistant. How can I help you achieve your financial goals today?</p>
+                        <span class="message-time">Just now</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="input-wrapper">
+                    <input type="text" 
+                           class="chat-input" 
+                           id="chatInput" 
+                           placeholder="Ask me anything about your finances..."
+                           autocomplete="off">
+                    
+                    <div class="input-actions">
+                        <button class="input-btn" id="attachBtn" title="Attach file">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <button class="input-btn" id="micBtn" title="Voice input">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="input-btn send-btn" id="sendBtn" title="Send message">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="suggested-actions">
+                    <button class="suggestion-chip">Portfolio analysis</button>
+                    <button class="suggestion-chip">Tax optimization</button>
+                    <button class="suggestion-chip">Investment advice</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Premium Settings Panel -->
+    <div class="settings-panel" id="settingsPanel" style="display: none;">
+        <div class="settings-header">
+            <h3>Settings</h3>
+            <button class="close-btn" id="closeSettings">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="settings-content">
+            <div class="setting-group">
+                <label>Avatar Quality</label>
+                <select id="avatarQuality">
+                    <option value="ultra">Ultra (Photorealistic)</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                </select>
+            </div>
+            
+            <div class="setting-group">
+                <label>Voice Settings</label>
+                <div class="toggle-group">
+                    <input type="checkbox" id="voiceEnabled" checked>
+                    <label for="voiceEnabled">Enable voice responses</label>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <label>Theme</label>
+                <select id="themeSelect">
+                    <option value="dark">Dark (Premium)</option>
+                    <option value="light">Light</option>
+                    <option value="auto">Auto</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Premium JavaScript -->
+    <script src="photorealistic_avatar.js"></script>
+    <script src="elite_digital_human.js"></script>
+</body>
+</html>

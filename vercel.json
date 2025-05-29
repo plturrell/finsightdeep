@@ -1,0 +1,13 @@
+{
+  "env": {
+    "NVIDIA_ENDPOINT": "https://jupyter0-s1ondnjfx.brevlab.com"
+  },
+  "outputDirectory": "public",
+  "buildCommand": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/public/$1"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "name": "aiqtoolkit-nvidia",
+  "version": "1.0.0",
+  "description": "A powerful, production-ready web interface for NVIDIA AI model integration and report generation",
+  "homepage": "https://github.com/plturrell/aiqtoolkit-nvidia#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plturrell/aiqtoolkit-nvidia.git"
+  },
+  "bugs": {
+    "url": "https://github.com/plturrell/aiqtoolkit-nvidia/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "AIQToolkit Team",
+    "email": "support@aiqtoolkit.ai",
+    "url": "https://aiqtoolkit.ai"
+  },
+  "keywords": [
+    "nvidia",
+    "ai",
+    "machine-learning",
+    "ui",
+    "serverless",
+    "vercel",
+    "aiqtoolkit",
+    "report-generator",
+    "web-interface"
+  ],
+  "scripts": {
+    "dev": "python -m http.server 3000",
+    "start": "python -m http.server 3000",
+    "build": "echo 'Static site - no build required'",
+    "test": "echo 'Tests will be implemented'",
+    "lint": "echo 'Linting configuration coming soon'",
+    "deploy": "vercel --prod",
+    "preview": "vercel"
+  },
+  "engines": {
+    "node": ">=18.x",
+    "python": ">=3.8"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "files": [
+    "api/",
+    "index.html",
+    "vercel.json",
+    "requirements.txt",
+    "README.md",
+    "LICENSE"
+  ]
+}

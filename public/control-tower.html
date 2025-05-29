@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIQToolkit - NVIDIA Control Tower</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #76b900;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nvidia-badge {
+            background: #76b900;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .service-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .service-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .service-status {
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        .status-online {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        .status-offline {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .status-unknown {
+            background: #f5f5f5;
+            color: #757575;
+        }
+        .service-details {
+            margin-top: 10px;
+        }
+        .details-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        .details-label {
+            width: 120px;
+            font-weight: 500;
+            color: #555;
+        }
+        .details-value {
+            flex: 1;
+        }
+        .service-metrics {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .metric-name {
+            color: #555;
+        }
+        .metric-value {
+            font-weight: 500;
+        }
+        .actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            background: #76b900;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5a8f00;
+        }
+        button.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        button.secondary:hover {
+            background: #e0e0e0;
+        }
+        .config-panel {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+        .config-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .config-label {
+            width: 150px;
+            font-weight: 500;
+        }
+        .config-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .performance-chart {
+            height: 100px;
+            margin-top: 10px;
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 10px;
+            background: #76b900;
+            transition: height 0.3s ease;
+        }
+        .refresh-timer {
+            text-align: right;
+            color: #777;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .navigation {
+            margin-bottom: 20px;
+        }
+        .navigation a {
+            margin-right: 15px;
+            color: #333;
+            text-decoration: none;
+        }
+        .navigation a:hover {
+            color: #76b900;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navigation">
+            <a href="index.html">Home</a>
+            <a href="control-tower.html"><strong>Control Tower</strong></a>
+            <a href="status.html">System Status</a>
+        </div>
+
+        <h1>
+            NVIDIA Services Control Tower
+            <span class="nvidia-badge">MONITORING</span>
+        </h1>
+
+        <div class="config-panel">
+            <h3>Global Configuration</h3>
+            <div class="config-row">
+                <div class="config-label">Backend URL:</div>
+                <input type="text" id="backendUrl" class="config-input" value="" placeholder="Current domain (auto-detected)">
+            </div>
+            <div class="config-row">
+                <div class="config-label">NVIDIA API Key:</div>
+                <input type="password" id="nvidiaApiKey" class="config-input" value="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" placeholder="Enter your NVIDIA API key">
+            </div>
+            <div class="config-row">
+                <div class="config-label">NVIDIA NIM Endpoint:</div>
+                <input type="text" id="nvidiaEndpoint" class="config-input" placeholder="https://jupyter0-s1ondnjfx.brevlab.com">
+            </div>
+            <div class="config-row">
+                <button onclick="saveConfig()">Save Configuration</button>
+                <button onclick="refreshAllServices()" class="secondary" style="margin-left: 10px;">Refresh All</button>
+            </div>
+        </div>
+
+        <div style="margin: 20px 0; display: flex; flex-wrap: wrap; gap: 10px;">
+            <button onclick="showServiceSection('api-services')" class="secondary" style="flex: 1;">API Services</button>
+            <button onclick="showServiceSection('processing-engines')" class="secondary" style="flex: 1;">Processing Engines</button>
+            <button onclick="showServiceSection('all-services')" style="flex: 1;">All Services</button>
+        </div>
+
+        <!-- API Services Section -->
+        <div id="api-services" class="service-section">
+            <h2 style="margin-bottom: 15px; color: #555;">NVIDIA API Services</h2>
+            <div class="dashboard-grid">
+                <!-- NVIDIA NIM Service Card -->
+                <div class="service-card" id="nim-service">
+                    <div class="service-header">
+                        <h3 class="service-name">NVIDIA NIM</h3>
+                        <span class="service-status status-unknown" id="nim-status">Unknown</span>
+                    </div>
+                    <div class="service-details">
+                        <div class="details-row">
+                            <div class="details-label">Endpoint:</div>
+                            <div class="details-value" id="nim-endpoint">-</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Models:</div>
+                            <div class="details-value" id="nim-models">-</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Last Response:</div>
+                            <div class="details-value" id="nim-response-time">-</div>
+                        </div>
+                    </div>
+                    <div class="service-metrics">
+                        <h4>Performance Metrics</h4>
+                        <div class="metric-row">
+                            <div class="metric-name">Response Time</div>
+                            <div class="metric-value" id="nim-latency">-</div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="metric-name">Token Generation</div>
+                            <div class="metric-value" id="nim-token-rate">-</div>
+                        </div>
+                        <div class="performance-chart" id="nim-chart"></div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="testService('nim')">Test Connection</button>
+                        <button onclick="pingService('nim')" class="secondary">Ping</button>
+                    </div>
+                </div>
+
+                <!-- NVIDIA API Service Card -->
+                <div class="service-card" id="api-service">
+                    <div class="service-header">
+                        <h3 class="service-name">NVIDIA API</h3>
+                        <span class="service-status status-unknown" id="api-status">Unknown</span>
+                    </div>
+                    <div class="service-details">
+                        <div class="details-row">
+                            <div class="details-label">Endpoint:</div>
+                            <div class="details-value">https://api.nvidia.com</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">API Version:</div>
+                            <div class="details-value" id="api-version">-</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Last Response:</div>
+                            <div class="details-value" id="api-response-time">-</div>
+                        </div>
+                    </div>
+                    <div class="service-metrics">
+                        <h4>Performance Metrics</h4>
+                        <div class="metric-row">
+                            <div class="metric-name">Response Time</div>
+                            <div class="metric-value" id="api-latency">-</div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="metric-name">Token Generation</div>
+                            <div class="metric-value" id="api-token-rate">-</div>
+                        </div>
+                        <div class="performance-chart" id="api-chart"></div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="testService('api')">Test Connection</button>
+                        <button onclick="pingService('api')" class="secondary">Ping</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Engines Section -->
+        <div id="processing-engines" class="service-section" style="display: none;">
+            <h2 style="margin-bottom: 15px; color: #555;">NVIDIA Processing Engines</h2>
+            <div class="dashboard-grid">
+                <!-- NVIDIA NeMo Service Card -->
+                <div class="service-card" id="nemo-service">
+                    <div class="service-header">
+                        <h3 class="service-name">NVIDIA NeMo</h3>
+                        <span class="service-status status-unknown" id="nemo-status">Unknown</span>
+                    </div>
+                    <div class="service-details">
+                        <div class="details-row">
+                            <div class="details-label">Endpoint:</div>
+                            <div class="details-value">https://api.nvidia.com/v1/nemo</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Models:</div>
+                            <div class="details-value" id="nemo-models">-</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Last Response:</div>
+                            <div class="details-value" id="nemo-response-time">-</div>
+                        </div>
+                    </div>
+                    <div class="service-metrics">
+                        <h4>Performance Metrics</h4>
+                        <div class="metric-row">
+                            <div class="metric-name">Response Time</div>
+                            <div class="metric-value" id="nemo-latency">-</div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="metric-name">Token Generation</div>
+                            <div class="metric-value" id="nemo-token-rate">-</div>
+                        </div>
+                        <div class="performance-chart" id="nemo-chart"></div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="testService('nemo')">Test Connection</button>
+                        <button onclick="pingService('nemo')" class="secondary">Ping</button>
+                    </div>
+                </div>
+
+                <!-- NVIDIA Triton Service Card -->
+                <div class="service-card" id="triton-service">
+                    <div class="service-header">
+                        <h3 class="service-name">NVIDIA Triton</h3>
+                        <span class="service-status status-unknown" id="triton-status">Unknown</span>
+                    </div>
+                    <div class="service-details">
+                        <div class="details-row">
+                            <div class="details-label">Endpoint:</div>
+                            <div class="details-value" id="triton-endpoint">-</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Server Version:</div>
+                            <div class="details-value" id="triton-version">-</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Last Response:</div>
+                            <div class="details-value" id="triton-response-time">-</div>
+                        </div>
+                    </div>
+                    <div class="service-metrics">
+                        <h4>Performance Metrics</h4>
+                        <div class="metric-row">
+                            <div class="metric-name">Response Time</div>
+                            <div class="metric-value" id="triton-latency">-</div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="metric-name">Inference Rate</div>
+                            <div class="metric-value" id="triton-inference-rate">-</div>
+                        </div>
+                        <div class="performance-chart" id="triton-chart"></div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="testService('triton')">Test Connection</button>
+                        <button onclick="pingService('triton')" class="secondary">Ping</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Processor Methods Section -->
+        <div id="processor-methods" class="service-section" style="display: none; margin-top: 30px;">
+            <h2 style="margin-bottom: 15px; color: #555;">NVIDIA Processor Methods</h2>
+            <div class="dashboard-grid">
+                <!-- CUDA Method Card -->
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3 class="service-name">CUDA Core</h3>
+                        <span class="service-status status-online">Active</span>
+                    </div>
+                    <div class="service-details">
+                        <div class="details-row">
+                            <div class="details-label">Hardware:</div>
+                            <div class="details-value">NVIDIA A100</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">CUDA Version:</div>
+                            <div class="details-value">12.2</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Status:</div>
+                            <div class="details-value">Operational</div>
+                        </div>
+                    </div>
+                    <div class="service-metrics">
+                        <h4>Performance Metrics</h4>
+                        <div class="metric-row">
+                            <div class="metric-name">Utilization</div>
+                            <div class="metric-value">87%</div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="metric-name">Memory Usage</div>
+                            <div class="metric-value">32GB / 40GB</div>
+                        </div>
+                        <div class="performance-chart"></div>
+                    </div>
+                </div>
+
+                <!-- Tensor Core Method Card -->
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3 class="service-name">Tensor Core</h3>
+                        <span class="service-status status-online">Active</span>
+                    </div>
+                    <div class="service-details">
+                        <div class="details-row">
+                            <div class="details-label">Hardware:</div>
+                            <div class="details-value">NVIDIA A100</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">TensorRT:</div>
+                            <div class="details-value">8.6.1</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Status:</div>
+                            <div class="details-value">Operational</div>
+                        </div>
+                    </div>
+                    <div class="service-metrics">
+                        <h4>Performance Metrics</h4>
+                        <div class="metric-row">
+                            <div class="metric-name">Utilization</div>
+                            <div class="metric-value">92%</div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="metric-name">Throughput</div>
+                            <div class="metric-value">156 TFLOPS</div>
+                        </div>
+                        <div class="performance-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Services View -->
+        <div id="all-services" class="service-section">
+            <h2 style="margin-bottom: 15px; color: #555;">All NVIDIA Services</h2>
+            <div class="dashboard-grid">
+                <!-- NVIDIA NIM Service Card -->
+                <div class="service-card" id="nim-service-all">
+                    <div class="service-header">
+                        <h3 class="service-name">NVIDIA NIM</h3>
+                        <span class="service-status status-unknown" id="nim-status-all">Unknown</span>
+                    </div>
+                    <div class="service-details">
+                        <div class="details-row">
+                            <div class="details-label">Endpoint:</div>
+                            <div class="details-value" id="nim-endpoint-all">-</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Function:</div>
+                            <div class="details-value">Custom Inference Microservices</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Last Response:</div>
+                            <div class="details-value" id="nim-response-time-all">-</div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="testService('nim')">Test Connection</button>
+                    </div>
+                </div>
+
+                <!-- NVIDIA API Service Card -->
+                <div class="service-card" id="api-service-all">
+                    <div class="service-header">
+                        <h3 class="service-name">NVIDIA API</h3>
+                        <span class="service-status status-unknown" id="api-status-all">Unknown</span>
+                    </div>
+                    <div class="service-details">
+                        <div class="details-row">
+                            <div class="details-label">Endpoint:</div>
+                            <div class="details-value">https://api.nvidia.com</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Function:</div>
+                            <div class="details-value">Standard Chat Completions</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Last Response:</div>
+                            <div class="details-value" id="api-response-time-all">-</div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="testService('api')">Test Connection</button>
+                    </div>
+                </div>
+
+                <!-- NVIDIA NeMo Service Card -->
+                <div class="service-card" id="nemo-service-all">
+                    <div class="service-header">
+                        <h3 class="service-name">NVIDIA NeMo</h3>
+                        <span class="service-status status-unknown" id="nemo-status-all">Unknown</span>
+                    </div>
+                    <div class="service-details">
+                        <div class="details-row">
+                            <div class="details-label">Endpoint:</div>
+                            <div class="details-value">https://api.nvidia.com/v1/nemo</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Function:</div>
+                            <div class="details-value">Text Generation Service</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Last Response:</div>
+                            <div class="details-value" id="nemo-response-time-all">-</div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="testService('nemo')">Test Connection</button>
+                    </div>
+                </div>
+
+                <!-- NVIDIA Triton Service Card -->
+                <div class="service-card" id="triton-service-all">
+                    <div class="service-header">
+                        <h3 class="service-name">NVIDIA Triton</h3>
+                        <span class="service-status status-unknown" id="triton-status-all">Unknown</span>
+                    </div>
+                    <div class="service-details">
+                        <div class="details-row">
+                            <div class="details-label">Endpoint:</div>
+                            <div class="details-value" id="triton-endpoint-all">-</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Function:</div>
+                            <div class="details-value">Inference Server</div>
+                        </div>
+                        <div class="details-row">
+                            <div class="details-label">Last Response:</div>
+                            <div class="details-value" id="triton-response-time-all">-</div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="testService('triton')">Test Connection</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="refresh-timer" id="refresh-timer">
+            Auto-refresh in: 60s
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        let config = {
+            backendUrl: window.location.origin,
+            nvidiaApiKey: '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',
+            nvidiaEndpoint: ''
+        };
+
+        // Performance metrics history
+        let performanceHistory = {
+            nim: [],
+            api: [],
+            nemo: [],
+            triton: []
+        };
+
+        // Services configuration
+        const allServices = {
+            api: {
+                name: 'NVIDIA API',
+                endpoint: 'https://api.nvidia.com/v1/chat/completions',
+                category: 'api-services'
+            },
+            nim: {
+                name: 'NVIDIA NIM',
+                endpoint: 'custom_endpoint/v1/chat/completions',
+                category: 'api-services'
+            },
+            nemo: {
+                name: 'NVIDIA NeMo',
+                endpoint: 'https://api.nvidia.com/v1/nemo/generate',
+                category: 'processing-engines'
+            },
+            triton: {
+                name: 'NVIDIA Triton',
+                endpoint: 'custom_endpoint/v2/models/{model}/infer',
+                category: 'processing-engines'
+            }
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved configuration
+            loadConfig();
+            
+            // Auto-populate backend URL
+            document.getElementById('backendUrl').value = config.backendUrl;
+            document.getElementById('nvidiaApiKey').value = config.nvidiaApiKey || '';
+            document.getElementById('nvidiaEndpoint').value = config.nvidiaEndpoint || '';
+            
+            // Initialize performance charts
+            initCharts();
+            
+            // Update duplicate endpoint displays
+            updateEndpointDisplays();
+            
+            // Test services on load
+            setTimeout(() => {
+                refreshAllServices();
+            }, 500);
+            
+            // Start refresh timer
+            startRefreshTimer();
+        });
+
+        // Load configuration from localStorage
+        function loadConfig() {
+            const savedConfig = localStorage.getItem('nvidiaControlTowerConfig');
+            if (savedConfig) {
+                const parsedConfig = JSON.parse(savedConfig);
+                config = { ...config, ...parsedConfig };
+            }
+        }
+
+        // Save configuration to localStorage
+        function saveConfig() {
+            config.backendUrl = document.getElementById('backendUrl').value;
+            config.nvidiaApiKey = document.getElementById('nvidiaApiKey').value;
+            config.nvidiaEndpoint = document.getElementById('nvidiaEndpoint').value;
+            
+            localStorage.setItem('nvidiaControlTowerConfig', JSON.stringify(config));
+            
+            // Update all endpoint displays
+            updateEndpointDisplays();
+            
+            // Test all services with new config
+            refreshAllServices();
+        }
+
+        // Update all endpoint displays across the dashboard
+        function updateEndpointDisplays() {
+            // Update NIM endpoints
+            document.querySelectorAll('[id^="nim-endpoint"]').forEach(el => {
+                el.textContent = config.nvidiaEndpoint || '-';
+            });
+            
+            // Update Triton endpoints
+            document.querySelectorAll('[id^="triton-endpoint"]').forEach(el => {
+                el.textContent = config.nvidiaEndpoint || '-';
+            });
+        }
+
+        // Show a specific service section
+        function showServiceSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.service-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show the selected section
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.style.display = 'block';
+            }
+            
+            // Special case for "All Services"
+            if (sectionId === 'all-services') {
+                // Also show processor methods
+                document.getElementById('processor-methods').style.display = 'block';
+            }
+        }
+
+        // View detailed service information
+        function viewServiceDetails(service) {
+            // This would open a modal or navigate to a detailed view
+            // For now, we'll just show a simple alert
+            const serviceInfo = allServices[service] || {};
+            alert(`${serviceInfo.name} Details\n\nEndpoint: ${serviceInfo.endpoint}\nCategory: ${serviceInfo.category}\n\nThis service provides ${service === 'ace' ? 'digital avatar and animation capabilities' : 'advanced 3D visualization and simulation'}.`);
+        }
+
+        // Initialize performance charts
+        function initCharts() {
+            const services = ['nim', 'api', 'nemo', 'triton'];
+            
+            services.forEach(service => {
+                const chart = document.getElementById(`${service}-chart`);
+                if (chart) {
+                    chart.innerHTML = '';
+                    
+                    // Create initial empty bars
+                    for (let i = 0; i < 10; i++) {
+                        const bar = document.createElement('div');
+                        bar.className = 'chart-bar';
+                        bar.style.left = `${i * 11}px`;
+                        bar.style.height = '0px';
+                        chart.appendChild(bar);
+                    }
+                }
+            });
+        }
+
+        // Update performance chart for a service
+        function updateChart(service, value) {
+            // Add new value to history
+            if (performanceHistory[service]) {
+                performanceHistory[service].push(value);
+                
+                // Keep only the last 10 values
+                if (performanceHistory[service].length > 10) {
+                    performanceHistory[service].shift();
+                }
+                
+                // Find the max value for scaling
+                const maxValue = Math.max(...performanceHistory[service], 1);
+                
+                // Update chart bars
+                const chart = document.getElementById(`${service}-chart`);
+                if (chart) {
+                    const bars = chart.querySelectorAll('.chart-bar');
+                    
+                    performanceHistory[service].forEach((val, index) => {
+                        if (bars[index]) {
+                            const height = (val / maxValue) * 90;
+                            bars[index].style.height = `${height}px`;
+                        }
+                    });
+                }
+            }
+        }
+
+        // Test a specific service
+        async function testService(service) {
+            // Update all instances of this service status
+            document.querySelectorAll(`[id^="${service}-status"]`).forEach(el => {
+                el.className = 'service-status status-unknown';
+                el.textContent = 'Testing...';
+            });
+            
+            const startTime = Date.now();
+            
+            try {
+                // Prepare the test request
+                const testPrompt = "Hello, this is a test message to check connectivity and performance.";
+                
+                const response = await fetch(`${config.backendUrl}/api/nvidia`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: testPrompt,
+                        service_type: service,
+                        model: service === 'nemo' ? 'nemo-model' : 'llama-3.1-70b-instruct',
+                        nvidia_api_key: config.nvidiaApiKey,
+                        nvidia_endpoint: config.nvidiaEndpoint
+                    })
+                });
+                
+                const data = await response.json();
+                const endTime = Date.now();
+                const latency = endTime - startTime;
+                
+                // Update service status based on response
+                if (data.status === 'success') {
+                    updateServiceStatus(service, 'online', data, latency);
+                } else {
+                    updateServiceStatus(service, 'error', data, latency);
+                }
+                
+                // Update performance metrics
+                updatePerformanceMetrics(service, data, latency);
+                
+            } catch (error) {
+                console.error(`Error testing ${service} service:`, error);
+                updateServiceStatus(service, 'offline', { error: error.message });
+            }
+        }
+
+        // Ping a service (lightweight test)
+        async function pingService(service) {
+            const startTime = Date.now();
+            
+            try {
+                // For ping, we just want to check if the service is responding
+                let endpoint = '';
+                
+                switch (service) {
+                    case 'nim':
+                        if (!config.nvidiaEndpoint) {
+                            throw new Error('NIM endpoint not configured');
+                        }
+                        endpoint = `${config.nvidiaEndpoint}/v1/models`;
+                        break;
+                    case 'api':
+                        endpoint = 'https://api.nvidia.com/v1/models';
+                        break;
+                    case 'nemo':
+                        endpoint = 'https://api.nvidia.com/v1/nemo/models';
+                        break;
+                    case 'triton':
+                        if (!config.nvidiaEndpoint) {
+                            throw new Error('Triton endpoint not configured');
+                        }
+                        endpoint = `${config.nvidiaEndpoint}/v2/health/ready`;
+                        break;
+                }
+                
+                // We use the backend as a proxy to avoid CORS issues
+                const response = await fetch(`${config.backendUrl}/api/health`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        endpoint: endpoint,
+                        service: service,
+                        api_key: config.nvidiaApiKey
+                    })
+                });
+                
+                const data = await response.json();
+                const endTime = Date.now();
+                const latency = endTime - startTime;
+                
+                // Update ping time
+                document.getElementById(`${service}-latency`).textContent = `${latency}ms`;
+                document.getElementById(`${service}-response-time`).textContent = new Date().toLocaleTimeString();
+                
+                // Update chart
+                updateChart(service, latency);
+                
+                // Update status based on response
+                if (data.status === 'success') {
+                    const statusEl = document.getElementById(`${service}-status`);
+                    statusEl.className = 'service-status status-online';
+                    statusEl.textContent = 'Online';
+                }
+                
+            } catch (error) {
+                console.error(`Error pinging ${service} service:`, error);
+                const statusEl = document.getElementById(`${service}-status`);
+                statusEl.className = 'service-status status-offline';
+                statusEl.textContent = 'Offline';
+            }
+        }
+
+        // Update service status in UI
+        function updateServiceStatus(service, status, data = {}, latency = 0) {
+            // Update all instances of this service status
+            document.querySelectorAll(`[id^="${service}-status"]`).forEach(el => {
+                switch (status) {
+                    case 'online':
+                        el.className = 'service-status status-online';
+                        el.textContent = 'Online';
+                        break;
+                    case 'offline':
+                        el.className = 'service-status status-offline';
+                        el.textContent = 'Offline';
+                        break;
+                    case 'error':
+                        el.className = 'service-status status-offline';
+                        el.textContent = 'Error';
+                        break;
+                    case 'testing':
+                        el.className = 'service-status status-unknown';
+                        el.textContent = 'Testing...';
+                        break;
+                    default:
+                        el.className = 'service-status status-unknown';
+                        el.textContent = 'Unknown';
+                }
+            });
+            
+            // Update all instances of response time
+            document.querySelectorAll(`[id^="${service}-response-time"]`).forEach(el => {
+                el.textContent = new Date().toLocaleTimeString();
+            });
+            
+            // Update all instances of endpoint for NIM and Triton
+            if (service === 'nim' || service === 'triton') {
+                document.querySelectorAll(`[id^="${service}-endpoint"]`).forEach(el => {
+                    el.textContent = config.nvidiaEndpoint || '-';
+                });
+            }
+            
+            // Update service-specific details
+            switch (service) {
+                case 'nim':
+                    if (document.getElementById('nim-models')) {
+                        document.getElementById('nim-models').textContent = data.model || '-';
+                    }
+                    break;
+                case 'api':
+                    if (document.getElementById('api-version')) {
+                        document.getElementById('api-version').textContent = 'v1';
+                    }
+                    break;
+                case 'nemo':
+                    if (document.getElementById('nemo-models')) {
+                        document.getElementById('nemo-models').textContent = data.model || '-';
+                    }
+                    break;
+                case 'triton':
+                    if (document.getElementById('triton-version')) {
+                        document.getElementById('triton-version').textContent = data.version || '-';
+                    }
+                    break;
+                case 'ace':
+                    if (document.getElementById('ace-version')) {
+                        document.getElementById('ace-version').textContent = data.version || '2.3.1';
+                    }
+                    break;
+                case 'omniverse':
+                    if (document.getElementById('omniverse-version')) {
+                        document.getElementById('omniverse-version').textContent = data.version || '4.1.2';
+                    }
+                    break;
+            }
+        }
+
+        // Update performance metrics
+        function updatePerformanceMetrics(service, data, latency) {
+            if (document.getElementById(`${service}-latency`)) {
+                document.getElementById(`${service}-latency`).textContent = `${latency}ms`;
+            }
+            
+            // Calculate tokens per second if usage information is available
+            if (data.usage && data.usage.completion_tokens) {
+                const tokens = data.usage.completion_tokens;
+                const seconds = latency / 1000;
+                const tokensPerSecond = Math.round(tokens / seconds);
+                
+                if (document.getElementById(`${service}-token-rate`)) {
+                    document.getElementById(`${service}-token-rate`).textContent = `${tokensPerSecond} tokens/sec`;
+                }
+            } else if (service === 'triton' && document.getElementById(`${service}-inference-rate`)) {
+                document.getElementById(`${service}-inference-rate`).textContent = 'N/A';
+            } else if (document.getElementById(`${service}-token-rate`)) {
+                document.getElementById(`${service}-token-rate`).textContent = 'N/A';
+            }
+            
+            // Update performance chart
+            updateChart(service, latency);
+        }
+
+        // Refresh all services
+        function refreshAllServices() {
+            const services = ['nim', 'api', 'nemo', 'triton'];
+            services.forEach(service => {
+                testService(service);
+            });
+        }
+
+        // Start refresh timer
+        function startRefreshTimer() {
+            let countdown = 60;
+            
+            const updateTimer = () => {
+                document.getElementById('refresh-timer').textContent = `Auto-refresh in: ${countdown}s`;
+                
+                if (countdown <= 0) {
+                    refreshAllServices();
+                    countdown = 60;
+                } else {
+                    countdown--;
+                }
+                
+                setTimeout(updateTimer, 1000);
+            };
+            
+            updateTimer();
+        }
+    </script>
+</body>
+</html>

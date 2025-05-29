@@ -1,0 +1,81 @@
+name: AIQToolkit NVIDIA Blueprint
+description: A web-based interface for monitoring and interacting with NVIDIA AI services integrated with the AIQToolkit.
+use_vm: true
+tags: [NVIDIA, AI, GPU, Control Tower, Dashboard, Blueprint]
+is_archived: false
+is_private: false
+github_url: https://github.com/plturrell/aiqtoolkit-nvidia
+
+content:
+  title: AIQToolkit NVIDIA Blueprint
+  description: |
+    This launchable provides a web-based interface for monitoring and interacting with 
+    NVIDIA AI services integrated with the AIQToolkit. It includes a control tower for 
+    real-time monitoring of NVIDIA services and their performance.
+    
+    ## Features
+    - Real-time monitoring of NVIDIA services
+    - Interactive NVIDIA API testing
+    - Performance visualization
+    - Multiple deployment options
+    
+    ## Services Monitored
+    - NVIDIA NIM (NVIDIA Inference Microservices)
+    - NVIDIA API
+    - NVIDIA NeMo
+    - NVIDIA Triton
+  
+  tags:
+    - NVIDIA
+    - AI
+    - GPU
+    - Control Tower
+    - Dashboard
+    - Blueprint
+  
+  image: null
+  
+  pre_run_message: |
+    ## Running the AIQToolkit NVIDIA Blueprint
+    
+    This will launch a Jupyter notebook that will let you start and interact with the AIQToolkit NVIDIA Blueprint.
+    
+    The notebook will:
+    1. Check for NVIDIA GPU availability
+    2. Let you configure NVIDIA API credentials
+    3. Start the web UI and API servers
+    4. Provide an interactive console
+    
+    If you have a NVIDIA API key, you'll be able to enter it in the notebook.
+  
+  developers:
+    - name: AIQToolkit Team
+      url: https://github.com/plturrell/aiqtoolkit-nvidia
+  
+  license: MIT
+  
+resources:
+  runtime: jupyter
+  requested_hw_config:
+    resource_tiers:
+      - variant: Jupyter
+        tier: gpu.t4.1x
+  
+  file_to_run: launch.ipynb
+  
+  setup_command: pip install -r requirements.txt
+
+parameters:
+  - name: nvidia_api_key
+    display_name: NVIDIA API Key
+    description: Your NVIDIA API key for accessing NVIDIA services (optional)
+    type: string
+    default: ""
+    required: false
+  
+  - name: nvidia_endpoint
+    display_name: NVIDIA NIM Endpoint
+    description: URL of the NVIDIA NIM endpoint (optional)
+    type: string
+    default: "https://jupyter0-s1ondnjfx.brevlab.com"
+    required: false
