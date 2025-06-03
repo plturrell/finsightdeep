@@ -1,0 +1,158 @@
+{
+  "name": "FinSight Platform",
+  "version": "1.0.0",
+  "description": "Financial analytics and AI platform",
+  "repository": "https://github.com/plturrell/finsight-monorepo",
+  "license": "Proprietary",
+  "author": "FinSight Team",
+  "maintainers": [
+    {
+      "name": "P. L. Turrell",
+      "email": "plturrell@example.com",
+      "role": "Project Lead"
+    }
+  ],
+  "environments": {
+    "development": {
+      "url": "http://localhost:3000",
+      "api": "http://localhost:8000",
+      "variables": {
+        "NODE_ENV": "development",
+        "DEBUG": "true"
+      }
+    },
+    "staging": {
+      "url": "https://staging.finsight.example.com",
+      "api": "https://api-staging.finsight.example.com",
+      "variables": {
+        "NODE_ENV": "production",
+        "DEBUG": "false"
+      }
+    },
+    "production": {
+      "url": "https://finsight.example.com",
+      "api": "https://api.finsight.example.com",
+      "variables": {
+        "NODE_ENV": "production",
+        "DEBUG": "false"
+      }
+    }
+  },
+  "apps": [
+    {
+      "name": "ai-engine",
+      "path": "apps/ai-engine",
+      "type": "python",
+      "description": "AI and ML capabilities",
+      "repository": "https://github.com/plturrell/finsightdeep",
+      "deployable": true,
+      "nvidia": true
+    },
+    {
+      "name": "data-platform",
+      "path": "apps/data-platform",
+      "type": "python",
+      "description": "Data processing and storage",
+      "repository": "https://github.com/plturrell/finsightdata",
+      "deployable": true,
+      "nvidia": false
+    },
+    {
+      "name": "web-dashboard",
+      "path": "apps/web-dashboard",
+      "type": "typescript",
+      "description": "Web UI for the platform",
+      "repository": "https://github.com/plturrell/finsightexperience",
+      "deployable": true,
+      "nvidia": false
+    },
+    {
+      "name": "utils",
+      "path": "apps/utils",
+      "type": "mixed",
+      "description": "Shared utilities",
+      "repository": "https://github.com/plturrell/finsightutils",
+      "deployable": false,
+      "nvidia": false
+    }
+  ],
+  "packages": [
+    {
+      "name": "api-client",
+      "path": "packages/api-client",
+      "type": "typescript",
+      "description": "API client library"
+    },
+    {
+      "name": "config",
+      "path": "packages/config",
+      "type": "mixed",
+      "description": "Shared configuration"
+    },
+    {
+      "name": "ui-components",
+      "path": "packages/ui-components",
+      "type": "typescript",
+      "description": "Shared UI components"
+    },
+    {
+      "name": "utils",
+      "path": "packages/utils",
+      "type": "mixed",
+      "description": "Shared utilities"
+    },
+    {
+      "name": "testing",
+      "path": "packages/testing",
+      "type": "mixed",
+      "description": "Testing utilities"
+    }
+  ],
+  "infrastructure": {
+    "docker": {
+      "registry": "ghcr.io/plturrell",
+      "baseImage": "node:16-alpine"
+    },
+    "kubernetes": {
+      "namespace": "finsight",
+      "deploymentTemplate": "infrastructure/kubernetes/deployment.yaml"
+    },
+    "aws": {
+      "region": "us-west-2",
+      "s3Bucket": "finsight-assets",
+      "cloudfront": "ABCDEFGHIJKLMN.cloudfront.net"
+    },
+    "nvidia": {
+      "platform": "NVIDIA GPU Cloud",
+      "launchableConfig": "launchables/finsightdeep-launchable.yaml"
+    }
+  },
+  "development": {
+    "standards": {
+      "javascript": {
+        "eslint": "packages/config/eslint.base.js",
+        "prettier": "packages/config/prettier.config.js"
+      },
+      "typescript": {
+        "tsconfig": "packages/config/tsconfig.base.json"
+      },
+      "python": {
+        "ruff": "packages/config/ruff.toml",
+        "mypy": "packages/config/mypy.base.ini"
+      }
+    },
+    "commitLint": {
+      "extends": ["@commitlint/config-conventional"]
+    },
+    "prTemplate": "project/templates/pull-request-template.md",
+    "issueTemplates": {
+      "bug": "project/templates/bug-report-template.md",
+      "feature": "project/templates/feature-request-template.md"
+    }
+  },
+  "docs": {
+    "architecture": "project/docs/architecture/overview.md",
+    "workflows": "project/docs/workflows/development.md",
+    "guidelines": "project/docs/guidelines/development.md"
+  }
+}
