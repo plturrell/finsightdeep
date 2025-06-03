@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "buildCommand": "python -m pip install -r requirements.txt && python -m src.api.setup",
+  "devCommand": "python main.py",
+  "outputDirectory": "public",
+  "framework": null,
+  "functions": {
+    "api/*.py": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ],
+  "env": {
+    "PYTHONPATH": "/vercel/path0"
+  },
+  "github": {
+    "silent": true,
+    "autoAlias": true
+  }
+}
